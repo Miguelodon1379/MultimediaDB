@@ -1,0 +1,29 @@
+/* styles.css */
+.visualizacion-contenido {
+    padding: 20px;
+  }
+  
+  .multimedia-item {
+    margin-bottom: 30px;
+  }
+  
+  .contenedor-multimedia {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .contenedor-multimedia h2 {
+    margin-bottom: 10px;
+  }
+  
+  .contenedor-multimedia p {
+    margin-bottom: 5px;
+  }
+  
+  .contenedor-multimedia embed,
+  .contenedor-multimedia audio,
+  .contenedor-multimedia video {
+    width: 100%;
+  }
+  
