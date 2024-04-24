@@ -1,6 +1,10 @@
 /* styles.css */
 .visualizacion-contenido {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
     padding: 20px;
+    background-color: rgb(190, 95, 95);
   }
   
   .multimedia-item {
