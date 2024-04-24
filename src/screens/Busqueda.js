@@ -20,6 +20,7 @@ function Busqueda() {
 
     return (
         <div className='Busqueda'>
+            
             <input className='form-control' type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar..." />
             <table className='table table-striped table-hover mt-5 shadow-lg'>
                 <thead>

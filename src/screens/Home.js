@@ -18,7 +18,7 @@ export default function Home() {
               Donde puedes explorar y disfrutar de una amplia variedad de contenido multimedia. Desde música hasta películas y libros, nuestra plataforma te permite buscar por título, autor, género, etiquetas y palabras clave para encontrar exactamente lo que estás buscando. 
               Además, podrás visualizar las carátulas y reproducir tus archivos multimedia favoritos con facilidad. 
             </Card.Text>
-            <Link to='/busqueda'><Button style={{ backgroundColor: '#1d2440', color: 'white' }}>Continua</Button></Link>
+            <Link to='/busqueda'><Button style={{ backgroundColor: '#010101', color: 'white' }}>Continua</Button></Link>
           </Card.Body>
         </Card>
       </div>
