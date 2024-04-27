@@ -1,33 +1,139 @@
 /* styles.css */
 .visualizacion-contenido {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
-    padding: 20px;
-    background-color: rgb(190, 95, 95);
+    color: #ffff;
+    text-align: center;
+    width: 100%; 
+    height: 100%;
+    padding: 80px;
+    background-color: rgb(0, 0, 0);
+    overflow: auto;
   }
+
+/* Estilos generales para los elementos multimedia */
+.multimedia-item.p {
+  margin-top: 1vw;
+  color: #ffff;
+  text-align: center; 
+}
+
+.multimedia-item.a {
+  margin-top: 10vw;
+  color: #ffff;
+  text-align: center; 
+}
+
+.multimedia-item.v {
+  color: #ffff;
+  text-align: center; 
+}
+
   
-  .multimedia-item {
-    margin-bottom: 30px;
-  }
+.contenedor-multimedia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  justify-content: center; 
+  align-items: center;
+}
   
-  .contenedor-multimedia {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
+.contenedor-multimedia h2 {
+  margin-bottom: 10px;
+}
   
-  .contenedor-multimedia h2 {
-    margin-bottom: 10px;
-  }
+.contenedor-multimedia p {
+  margin-bottom: 5px;
+}
   
-  .contenedor-multimedia p {
-    margin-bottom: 5px;
-  }
-  
-  .contenedor-multimedia embed,
-  .contenedor-multimedia audio,
-  .contenedor-multimedia video {
-    width: 100%;
-  }
+.contenedor-multimedia embed,
+.contenedor-multimedia audio,
+.contenedor-multimedia video {
+  width: 100%;
+}
+
+/* estilos para la barra del audio */
+audio {
+  margin-top: 5vw;
+  width: 80%;
+  max-width: 900px;
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: #808080;
+}
+
+  /* Estilos para el visualizador de PDF */
+.pdf-viewer {
+  margin-top: 1vw;
+  max-width: 80%; 
+  margin: 0 auto; 
+}
+
+/* Estilos para el reproductor de video */
+.video-player {
+  margin-top: 100px !important;
+  max-width: 80%; 
+  margin: 0 auto; 
+}
+
+/* Estilos para el contenedor del video */
+.video-container {
+  position: relative;
+}
+
+.video-thumbnail {
+  max-width: 100px;
+  position: absolute;
+  bottom: 70px;
+  left: 15%;
+  transform: translateX(-50%);
+}
+
+.video-details {
+  text-align: justify; 
+  margin: 0 auto 0; 
+  max-width: 1100px; 
+}
+
+/* Estilos para el contenedor del audio */
+.audio-container {
+  position: relative;
+}
+
+.audio-thumbnail {
+  max-width: 100px;
+  position: absolute;
+  bottom: 250px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.audio-details {
+  text-align: center;
+  margin-top: 110px; 
+}
+
+/* Estilos para el contenedor del PDF */
+.pdf-container {
+  position: relative;
+}
+
+.pdf-thumbnail {
+  max-width: 100px;
+  position: absolute;
+  bottom: 70px;
+  left: 15%;
+  transform: translateX(-50%);
+}
+
+.pdf-details {
+  text-align: justify; 
+  margin: 0 auto 50px; 
+  max-width: 1100px; 
+}
+
+
+
+
+
   
