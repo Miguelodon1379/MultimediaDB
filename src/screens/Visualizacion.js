@@ -19,7 +19,7 @@ import dummyData from '../assets/dummydata.js';
 import './css/styles.css';
 
 function VisualizacionContenido() {
-    const item = dummyData[1];
+    const item = dummyData[2];
   return (
     <div className="visualizacion-contenido">
       <h1>Visualización de Contenido Multimedia</h1>

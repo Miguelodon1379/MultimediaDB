@@ -1,16 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { BsSearch } from 'react-icons/bs'
 
-import './css/Busqueda.css';
+import { Button } from 'react-bootstrap'
+import Form from 'react-bootstrap/Form'
+import { FiFilter } from 'react-icons/fi'
+
+import ArchiveCard from '../components/ArchiveCard'
+
+import './css/Busqueda.css'
+import './css/styles.css'
 
 function Busqueda() {
-    const [data, setData] = useState([
-        { "id": 1, "name": "Libro 1", "lastName": "Autor 1", "email": "Género 1" },
-        { "id": 2, "name": "Libro 2", "lastName": "Autor 2", "email": "Género 2" },
-        { "id": 3, "name": "Libro 3", "lastName": "Autor 3", "email": "Género 3" },
-        { "id": 4, "name": "Libro 4", "lastName": "Autor 4", "email": "Género 4" }
-    ]);
+    const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
+    const [filter, setFilter] = useState("");
+
+    const fetchData = async (collectionName) => {
+        try {
+            const response = await fetch(`http://localhost:5050/api/getNotes/${collectionName}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const responseData = await response.json();
+            setData(responseData);
+        } catch (error) {
+            console.error('Error fetching datass:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData("musica");
+    }, []);
+
     const navigate = useNavigate()
 
     const handleClick = (rowData) => {
@@ -18,28 +40,91 @@ function Busqueda() {
         navigate('/visualiza', { state: { rowData } })
     };
 
+    const handleRadioChange = (label) => {
+        setFilter(label);
+    };
+
+    const checar = () => {
+        console.log(filter);
+    }
+
+    // Función para dividir el array en subarrays de tres elementos cada uno
+    const dividirEnFilas = (array, tamañoFila) => {
+        const filas = [];
+        for (let i = 0; i < array.length; i += tamañoFila) {
+        filas.push(array.slice(i, i + tamañoFila));
+        }
+        return filas;
+    };
+
+    // Divide el array de datos en filas de tres elementos cada una
+    const filasDeDatos = dividirEnFilas(data, 4);
+    
     return (
         <div className='Busqueda'>
-            
-            <input className='form-control' type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar..." />
-            <table className='table table-striped table-hover mt-5 shadow-lg'>
-                <thead>
-                    <tr>
-                        <th>Titulo</th>
-                        <th>Autor</th>
-                        <th>Género</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map(item => (
-                        <tr key={item.id} onClick={() => handleClick(item)}>
-                            <td>{item.name}</td>
-                            <td>{item.lastName}</td>
-                            <td>{item.email}</td>
-                        </tr>
+            <h1 className='searchTitle'>Busqueda de Contenido Multimedia</h1>
+            <div className="input-group mb-3">
+                <input
+                    type="text"
+                    className="form-control"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar..."
+                    aria-label="Buscar..."
+                    aria-describedby="button-addon2"
+                />
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                >
+                    <BsSearch />
+                </button>
+            </div>
+            {/* Se renderiza la parte del filtro */}
+            <div className="div-filter">
+                <Button variant="dark" style={{ margin: 10}} onClick={checar()} >
+                    <FiFilter />
+                </Button>
+
+                <div className="div-content-form">
+                    {[
+                        { label: 'Titulo', value: 'title' },
+                        { label: 'Genero', value: 'genre' },
+                        { label: 'Autor', value: 'author' }
+                    ].map(({ label, value }) => (
+                        <div key={value} className="mb-3">
+                            <Form.Check
+                                inline
+                                label={label}
+                                name="filter"
+                                type="radio"
+                                checked={filter === value}
+                                onChange={() => handleRadioChange(value)}
+                                id={`inline-${value}`}
+                                className='check-filter'
+                            />
+                        </div>
                     ))}
-                </tbody>
-            </table>
+                </div>  
+            </div>
+
+            {/* Se renderiza la parte de las cartas */}
+            <div>
+                {/* Renderiza cada fila */}
+                {filasDeDatos.map((fila, index) => (
+                    <div key={index} style={{ display: 'flex', justifyContent: 'center' }}>
+                    {/* Renderiza cada componente en la fila */}
+                    {fila.map((item) => (
+                        <div key={item._id} style={{ margin: '10px' }}>
+                            <Link to={`/visualiza/${item}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <ArchiveCard item={item} />
+                            </Link>
+                        </div>
+                    ))}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
