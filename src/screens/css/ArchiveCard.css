@@ -1,0 +1,15 @@
+.card-multi-cont{
+    display: flex;
+    overflow: hidden;
+    width: 20vw;
+}
+
+.card-body-multi{
+    overflow: hidden;
+    text-overflow: ellipsis; /* Para truncar el texto que no cabe */
+}
+
+.card-text-multi{
+    font-size: small;
+    border-top: 1px solid black
+}

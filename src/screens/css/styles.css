@@ -136,4 +136,19 @@ audio::-webkit-media-controls-panel {
 
 
 
+
+  .check-filter {
+    color:aliceblue;
+  }
+
+  .div-filter{
+    display: flex;
+    justify-content: center; /* Para alinear horizontalmente */
+    align-items: center;
+  }
+
+  .div-content-form{
+    display: flex;
+    height: 5vh;
+  }
   

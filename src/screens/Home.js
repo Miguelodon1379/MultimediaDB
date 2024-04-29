@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import './css/Home.css'
 import image1 from '../assets/imgs/multimedia-cover.jpg'
 
+
 export default function Home() {
   return (
     <div className='Home'>
