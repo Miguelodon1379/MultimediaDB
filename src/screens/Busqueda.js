@@ -11,29 +11,32 @@ import ArchiveCard from '../components/ArchiveCard'
 import './css/Busqueda.css'
 import './css/styles.css'
 
+//importar la base de datos
+import { db } from '../firebase config'
+import { collection, getDocs } from "firebase/firestore"; 
+
+// Función principal
+const getMultimedia = async () => {
+    const multimedia = [];
+    const querySnapshot = await getDocs(collection(db, "multimedia"));
+    querySnapshot.forEach((doc) => {
+        multimedia.push(doc.data());
+    });
+    return multimedia;
+};
+
 function Busqueda() {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
-
-    const fetchData = async (collectionName) => {
-        try {
-            const response = await fetch(`http://localhost:5050/api/getNotes/${collectionName}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const responseData = await response.json();
-            setData(prevData => [...prevData, ...responseData]);
-        } catch (error) {
-            console.error('Error fetching datas:', error);
-        }
-    };
+    
+    const navigate = useNavigate()
 
     useEffect(() => {
-        fetchData("libros");
+        getMultimedia().then((multimedia) => {
+            setData(multimedia);
+        });
     }, []);
-
-    const navigate = useNavigate()
 
     const handleClick = (item) => {
         navigate('/visualiza', { state: { item } })
@@ -58,6 +61,28 @@ function Busqueda() {
 
     // Divide el array de datos en filas de tres elementos cada una
     const filasDeDatos = dividirEnFilas(data, 4);
+
+    // Filtrar los datos basado en el filtro seleccionado y la búsqueda
+    const datosFiltrados = data.filter(item => {
+        if (!search) return true;
+        switch (filter) {
+            case 'titulo':
+                return item.titulo.toLowerCase().includes(search.toLowerCase());
+            case 'genero':
+                return item.genero.toLowerCase().includes(search.toLowerCase());
+            case 'autor':
+                return item.autor.toLowerCase().includes(search.toLowerCase());
+            case 'palabras_clave':
+                return item.palabras_clave.some(palabra => palabra.toLowerCase().includes(search.toLowerCase()));
+            case 'etiquetas':
+                return item.etiquetas.some(etiqueta => etiqueta.toLowerCase().includes(search.toLowerCase()));
+            default:
+                return true;
+        }
+    });
+
+     // Divide los datos filtrados en filas de tres elementos cada una
+     const filasDeDatosFiltrados = dividirEnFilas(datosFiltrados, 4);
     
     return (
         <div className='Busqueda'>
@@ -88,9 +113,11 @@ function Busqueda() {
 
                 <div className="div-content-form">
                     {[
-                        { label: 'Titulo', value: 'title' },
-                        { label: 'Genero', value: 'genre' },
-                        { label: 'Autor', value: 'author' }
+                        { label: 'Titulo', value: 'titulo' },
+                        { label: 'Genero', value: 'genero' },
+                        { label: 'Autor', value: 'autor' },
+                        { label: 'Palabras clave', value: 'palabras_clave' },
+                        { label: 'Etiquetas', value: 'etiquetas' }
                     ].map(({ label, value }) => (
                         <div key={value} className="mb-3">
                             <Form.Check
@@ -111,11 +138,11 @@ function Busqueda() {
             {/* Se renderiza la parte de las cartas */}
             <div>
                 {/* Renderiza cada fila */}
-                {filasDeDatos.map((fila, index) => (
-                    <div key={index} style={{ display: 'flex', justifyContent: 'center' }}>
+                {filasDeDatosFiltrados.map((fila, index) => (
+                    <div key={`fila-${index}`} style={{ display: 'flex', justifyContent: 'center' }}>
                     {/* Renderiza cada componente en la fila */}
-                    {fila.map((item) => (
-                        <div key={item._id} style={{ margin: '10px' }}>
+                    {fila.map((item, itemIndex) => (
+                        <div key={`item-${index}-${itemIndex}`} style={{ margin: '10px' }}>
                             <button style={{ border: 'none', background: 'none', padding: 0, margin: 0 }} onClick={() => handleClick(item)}>
                                 <ArchiveCard item={item} />
                             </button>
