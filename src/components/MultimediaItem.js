@@ -10,7 +10,6 @@ function MultimediaItem({ item }) {
           <h2>{item.titulo}</h2>
           <p>Autor: {item.autor}</p>
           <p>Género: {item.genero}</p>
-          <p>Descripción: {item.descripcion}</p>
         </div>
       </div>
       {renderizarContenido(item)}
