@@ -1,62 +1,51 @@
-// MultimediaItem.js
-import React from 'react';
-import '../screens/css/styles.css';
+import React, { useEffect, useState } from 'react';
 
 function MultimediaItem({ item }) {
-  switch (item.tipo) {
-    case 'pdf':
-      return (
-        <div className="multimedia-item p">
-          <div className="pdf-container">
-            <img src={item.imagen} alt="PDF Thumbnail" className="pdf-thumbnail" />
-            <div className="pdf-details">
-              <h2>{item.titulo}</h2>
-              <p>Autor: {item.autor}</p>
-              <p>Género: {item.genero}</p>
-              <p>Descripción: {item.descripcion}</p>
-            </div>
-          </div>
-          {renderizarContenido(item)}
+  const [imagenSrc, setImagenSrc] = useState('');
+
+  useEffect(() => {
+    async function fetchImg() {
+      try {
+        const response = await fetch(`http://localhost:5050/api/download/portadas/${item.portada_id}`);
+
+        if (!response.ok) {
+          throw new Error('Error al obtener la imagen');
+        }
+
+        const blob = await response.blob();
+        const extension = blob.type.split('/')[1]; // Extraer la extensión del tipo MIME
+        const url = URL.createObjectURL(blob) + '.' + extension; 
+
+        console.log('Imagen cargada:', url);
+
+        setImagenSrc(url);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    fetchImg();
+  }, [item.portada_id]);
+
+  return (
+    <div className={`multimedia-item ${item.filetype.charAt(0)}`}>
+      <div className={`${item.filetype}-container`}>
+        <img src={imagenSrc} alt="Thumbnail" className={`${item.filetype}-thumbnail`} />
+        <div className={`${item.filetype}-details`}>
+          <h2>{item.titulo}</h2>
+          <p>Autor: {item.autor}</p>
+          <p>Género: {item.genero}</p>
+          <p>Descripción: {item.descripcion}</p>
         </div>
-      );
-      case 'audio':
-      return (
-        <div className="multimedia-item a">
-          <div className="audio-container">
-            <img src={item.imagen} alt="Audio Thumbnail" className="audio-thumbnail" />
-            <div className="audio-details">
-              <h2>{item.titulo}</h2>
-              <p>Autor: {item.autor}</p>
-              <p>Género: {item.genero}</p>
-              <p>Descripción: {item.descripcion}</p>
-            </div>
-          </div>
-          {renderizarContenido(item)}
-        </div>
-      );
-    case 'video':
-      return (
-        <div className="multimedia-item v">
-          <div className="video-container">
-            <img src={item.imagen} alt="Video Thumbnail" className="video-thumbnail" />
-            <div className="video-details">
-              <h2>{item.titulo}</h2>
-              <p>Autor: {item.autor}</p>
-              <p>Género: {item.genero}</p>
-              <p>Descripción: {item.descripcion}</p>
-            </div>
-          </div>
-          {renderizarContenido(item)}
-        </div>
-      );
-    default:
-      return null;
-  }
+      </div>
+      {renderizarContenido(item)}
+    </div>
+  );
 }
 
 function renderizarContenido(item) {
-  switch (item.tipo) {
-    case 'pdf':
+  switch (item.filetype) {
+    case 'libro':
       return <embed className="pdf-viewer" src={item.url} type="application/pdf" height="650px" />;
     case 'audio':
       return <audio controls src={item.url} />;

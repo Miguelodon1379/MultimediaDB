@@ -23,21 +23,20 @@ function Busqueda() {
                 throw new Error('Network response was not ok');
             }
             const responseData = await response.json();
-            setData(responseData);
+            setData(prevData => [...prevData, ...responseData]);
         } catch (error) {
-            console.error('Error fetching datass:', error);
+            console.error('Error fetching datas:', error);
         }
     };
 
     useEffect(() => {
-        fetchData("musica");
+        fetchData("libros");
     }, []);
 
     const navigate = useNavigate()
 
-    const handleClick = (rowData) => {
-        console.log(rowData);
-        navigate('/visualiza', { state: { rowData } })
+    const handleClick = (item) => {
+        navigate('/visualiza', { state: { item } })
     };
 
     const handleRadioChange = (label) => {
@@ -117,9 +116,9 @@ function Busqueda() {
                     {/* Renderiza cada componente en la fila */}
                     {fila.map((item) => (
                         <div key={item._id} style={{ margin: '10px' }}>
-                            <Link to={`/visualiza/${item}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <button style={{ border: 'none', background: 'none', padding: 0, margin: 0 }} onClick={() => handleClick(item)}>
                                 <ArchiveCard item={item} />
-                            </Link>
+                            </button>
                         </div>
                     ))}
                     </div>

@@ -1,15 +1,26 @@
-import express from "express";
+import express from "express"
+import path from "path"
+import Grid from "gridfs-stream"
+import * as mongoose from 'mongoose';
+import multer from "multer";
+import {GridFsStorage} from 'multer-gridfs-storage'
+import fs from "fs"
+import crypto from "crypto"
+import { ObjectId } from 'mongodb'; // Importa ObjectId de la biblioteca mongodb
 
-// This will help us connect to the database
-import db from "../db/connection.js";
+import mongodb from "mongodb";
 
-// This help convert the id from string to ObjectId for the _id.
-import { ObjectId } from "mongodb";
+import db from "../db/connection.js"
 
-// router is an instance of the express router.
-// We use it to define our routes.
-// The router will be added as a middleware and will take control of requests starting with path /record.
-const router = express.Router();
+const router = express.Router()
+
+const bucket = new mongodb.GridFSBucket(db, {
+  bucketName: 'portadas'
+});
+
+router.get("/", (req, res) => {
+  res.send("Server ON")
+})
 
 // This section will help you get a list of all the records.
 router.get("/api/getNotes/:collectionName", async (req, res) => {
@@ -19,72 +30,119 @@ router.get("/api/getNotes/:collectionName", async (req, res) => {
     const results = await collection.find({}).toArray();
     res.send(results).status(200);
   } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).send("Error fetching data");
+    console.error("Error fetching data:", error)
+    res.status(500).send("Error fetching data")
   }
-});
+  console.log("Data fetched successfully")
+})
 
-// This section will help you get a single record by id
-router.get("/:id", async (req, res) => {
-  let collection = await db.collection("records");
-  let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
 
-  if (!result) res.send("Not found").status(404);
-  else res.send(result).status(200);
-});
 
-// This section will help you create a new record.
-router.post("/", async (req, res) => {
+
+router.get("/api/download/:collectionName/:id", async (req, res) => {
   try {
-    let newDocument = {
-      name: req.body.name,
-      position: req.body.position,
-      level: req.body.level,
-    };
-    let collection = await db.collection("records");
-    let result = await collection.insertOne(newDocument);
-    res.send(result).status(204);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error adding record");
+    const collectionName = req.params.collectionName;
+    const id = req.params.id;
+
+    // Verificar si la colección existe
+    if (!db.collection(collectionName)) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
+    // Convertir el id proporcionado a un ObjectId
+    const objectId = new ObjectId(id);
+
+    // Buscar el archivo en el bucket por su _id
+    const file = await db.collection(collectionName).findOne({ _id: objectId });
+
+    // Si no se encuentra el archivo, devolver un error 404
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Configurar los encabezados de la respuesta para indicar que es una imagen
+    res.setHeader('Content-Type', 'image/jpg');
+    
+    // Devolver el contenido del archivo como respuesta
+    res.send(file);
+
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    res.status(500).json({ error: "Error downloading file" });
   }
 });
 
-// This section will help you update a record by id.
-router.patch("/:id", async (req, res) => {
+
+
+// Ruta para subir un archivo a la base de datos
+/*router.post("/api/uploadFile", upload.single("file"), async (req, res) => {
   try {
-    const query = { _id: new ObjectId(req.params.id) };
-    const updates = {
-      $set: {
-        name: req.body.name,
-        position: req.body.position,
-        level: req.body.level,
-      },
-    };
+    // Verifica si hay un archivo en la solicitud
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" })
+    }
 
-    let collection = await db.collection("records");
-    let result = await collection.updateOne(query, updates);
-    res.send(result).status(200);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error updating record");
+    // Guarda el archivo en la base de datos utilizando GridFS
+    const writestream = gfs.createWriteStream({
+      filename: req.file.filename,
+    });
+    const readstream = fs.createReadStream(req.file.path);
+    readstream.pipe(writestream)
+
+    return res.status(200).json({ message: "File uploaded successfully" })
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    return res.status(500).json({ message: "Error uploading file" })
   }
+})*/
+
+/*router.get('/api/downloadFile/:collectionName/:fileId', (req, res) => {
+  console.log("Downloading file... ", req.params.collectionName,req.params.fileId)
+  const collectionName = req.params.collectionName;
+  const fileId = req.params.fileId;
+
+  // Buscar el archivo en la colección especificada
+  gfs.files.findOne({filename: fileId}),(err, files) => {
+    if(!files || files.legth === 0) {
+      return res.status(404).json({
+        err: 'No files exist'
+      })
+    }
+
+    return res.json(files)
+
+  }
+})*/
+
+router.get('/api/getFiles/:collectionName', (req, res) => {
+  const collectionName = req.params.collectionName;
+  console.log("Getting files from... ", collectionName)
+  // Verifica si la colección especificada existe
+  if (!gfs.collections[collectionName]) {
+    return res.status(404).json({
+      error: 'Collection not found'
+    });
+  }else {
+    console.log("Collection found")
+  }
+
+  // Buscar el archivo en la colección especificada
+  gfs.collection(collectionName).find().toArray((err, files) => {
+    if (err) {
+      return res.status(500).json({
+        error: 'Error fetching files'
+      });
+    }
+
+    if (!files || files.length === 0) {
+      return res.status(404).json({
+        error: 'No files exist in the collection'
+      });
+    }
+
+    return res.json(files);
+  });
 });
 
-// This section will help you delete a record
-router.delete("/:id", async (req, res) => {
-  try {
-    const query = { _id: new ObjectId(req.params.id) };
-
-    const collection = db.collection("records");
-    let result = await collection.deleteOne(query);
-
-    res.send(result).status(200);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error deleting record");
-  }
-});
 
 export default router;

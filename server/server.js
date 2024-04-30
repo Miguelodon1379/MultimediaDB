@@ -1,13 +1,15 @@
-import express from "express";
-import cors from "cors";
-import records from "./routes/record.js";
+import express from "express"
+import bodyParser from "body-parser"
+import rutas from "./routes/record.js"
+import cors from "cors"
 
-const PORT = process.env.PORT || 5050;
 const app = express();
+const PORT = process.env.PORT || 5050;
 
+app.use(bodyParser.json());
 app.use(cors());
-app.use(express.json());
-app.use(records);
+app.use(rutas);
+
 
 
 // start the Express server
